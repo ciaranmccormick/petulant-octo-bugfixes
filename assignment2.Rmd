@@ -1,0 +1,56 @@
+---
+title: "Analysis of NOAA Storm Database and its impact on human life."
+output: html_document
+---
+
+## Synopsis
+
+## Data Processing
+
+Start by downloading and extracting the csv file from the bz2 archive file. The
+data is stored as a data frame `storm.data`.
+
+```{r cache=TRUE}
+zipFileName <- "repdata-data-StormData.csv.bz2"
+con <- bzfile(zipFileName)
+storm.data <- read.csv(con)
+```
+
+We can get a summary of all the different event types by using the `summary`
+function on the column `EVTYPE
+
+```{r}
+summary(storm.data$EVTYPE)
+```
+
+Using `head` we can see the top 10 weather events in the data frame,
+
+```{r}
+head(summary(storm.data$EVTYPE), n=10)
+```
+
+From this we can see that due to some inconsistance in the labelling we have
+some data that is similar but not the same but could be counted as the same. For
+example `THUNDERSTORM WIND` and `THUNDERSTORM WINDS` are clearly the same. Is
+this the same as `HIGH WIND`. It is almost certainly the same as `TSTM WIND`.
+
+So lets clean up these `EVTYPE`s.
+
+```{r}
+storm.data$EVTYPE <- gsub("TSTM","THUNDERSTORM",storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("WINDS","WIND",storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("MARINE ","",storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("FLASH ","",storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("STREAM FLD", "FLOOD", storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("URBAN/SML FLOOD", "FLOOD", storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("FLOODING", "FLOOD", storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("COASTAL FLOOD", "FLOOD", storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("STRONG WIND", "HIGH WIND", storm.data$EVTYPE)
+storm.data$EVTYPE <- gsub("WILD/FOREST FIRE","WILDFIRE",storm.data$EVTYPE)
+storm.data$EVTYPE <- factor(storm.data$EVTYPE)
+head(summary(storm.data$EVTYPE),n=15)
+```
+
+We now need to count the number of fatalities and injuries by the `EVTYPE`.
+
+## Results
